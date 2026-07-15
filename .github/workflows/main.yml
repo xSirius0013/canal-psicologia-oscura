@@ -1,0 +1,23 @@
+name: Ejecutar Agente Investigador
+
+on:
+  workflow_dispatch: # Esto significa: "Ejecuta solo cuando yo aprete el botón"
+
+jobs:
+  investigar:
+    runs-on: ubuntu-latest # GitHub te regala una computadora Linux gratis para esto
+    
+    steps:
+      - name: Descargar mi codigo
+        uses: actions/checkout@v4
+        
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Instalar herramientas (yt-dlp)
+        run: pip install -r requirements.txt
+        
+      - name: Despertar al Agente Investigador
+        run: python investigador.py
