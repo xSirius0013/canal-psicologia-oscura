@@ -1,30 +1,50 @@
-import yt_dlp
+import os
+import requests
+import json
 
 def buscar_videos_virales():
-    print("🕵️‍♂️ Agente 1: Iniciando búsqueda de videos de psicología oscura...")
+    print("🕵️‍♂️ Agente 1: Iniciando búsqueda oficial en YouTube...")
     
-    opciones = {
-        'quiet': True,
-        'no_warnings': True,
-        'skip_download': True,
-    }
+    # Sacamos la llave mágica de la caja fuerte de GitHub
+    api_key = os.environ.get("YOUTUBE_API_KEY")
+    
+    if not api_key:
+        print("❌ Error: No se encontró la YOUTUBE_API_KEY en los Secrets.")
+        return
+
+    # Usamos la puerta oficial de YouTube
+    url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&order=viewCount&q=psicologia+oscura&maxResults=5&key={api_key}"
     
     try:
-        with yt_dlp.YoutubeDL(opciones) as ydl:
-            # Buscamos los 5 videos más relevantes sobre psicología oscura en español
-            resultados = ydl.extract_info("ytsearch5:psicología oscura", download=False)
+        respuesta = requests.get(url)
+        datos = respuesta.json()
+        
+        # Si YouTube devuelve un error, lo mostramos
+        if 'error' in datos:
+            print(f"❌ Error de YouTube: {datos['error']['message']}")
+            return
             
-            print("\n📊 === TOP 5 VIDEOS VIRALES ENCONTRADOS ===\n")
+        print("\n📊 === TOP 5 VIDEOS VIRALES ENCONTRADOS ===\n")
+        
+        for i, item in enumerate(datos.get('items', []), 1):
+            titulo = item['snippet']['title']
+            video_id = item['id']['videoId']
+            url_video = f"https://youtube.com/watch?v={video_id}"
             
-            for i, video in enumerate(resultados.get('entries', []), 1):
-                print(f"{i}. Título: {video.get('title', 'Desconocido')}")
-                print(f"   Views: {video.get('view_count', 0):,}")
-                print(f"   URL: https://youtube.com/watch?v={video.get('id')}")
-                print("-" * 50)
-                
+            # Buscamos las estadísticas (views) de cada video
+            url_stats = f"https://www.googleapis.com/youtube/v3/videos?part=statistics&id={video_id}&key={api_key}"
+            resp_stats = requests.get(url_stats)
+            stats = resp_stats.json()['items'][0]['statistics']
+            
+            vistas = int(stats.get('viewCount', 0))
+            
+            print(f"{i}. Título: {titulo}")
+            print(f"   Views: {vistas:,}")
+            print(f"   URL: {url_video}")
+            print("-" * 50)
+            
     except Exception as e:
         print(f"Ocurrió un error: {e}")
 
-# Esta es la orden principal para que el agente despierte y trabaje
 if __name__ == "__main__":
     buscar_videos_virales()
