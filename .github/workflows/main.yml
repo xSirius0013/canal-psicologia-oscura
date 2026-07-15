@@ -1,11 +1,13 @@
 name: Ejecutar Agente Investigador
 
 on:
-  workflow_dispatch: # Esto significa: "Ejecuta solo cuando yo aprete el botón"
+  workflow_dispatch:
 
 jobs:
   investigar:
-    runs-on: ubuntu-latest # GitHub te regala una computadora Linux gratis para esto
+    runs-on: ubuntu-latest
+    env:
+      YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }} # Aquí le pasamos la llave
     
     steps:
       - name: Descargar mi codigo
@@ -16,8 +18,9 @@ jobs:
         with:
           python-version: '3.11'
           
-      - name: Instalar herramientas (yt-dlp)
-        run: pip install -r requirements.txt
+      - name: Instalar herramientas (requests)
+        run: pip install requests
         
       - name: Despertar al Agente Investigador
         run: python investigador.py
+
