@@ -5,21 +5,18 @@ import json
 def buscar_videos_virales():
     print("🕵️‍♂️ Agente 1: Iniciando búsqueda oficial en YouTube...")
     
-    # Sacamos la llave mágica de la caja fuerte de GitHub
     api_key = os.environ.get("YOUTUBE_API_KEY")
     
     if not api_key:
         print("❌ Error: No se encontró la YOUTUBE_API_KEY en los Secrets.")
         return
 
-    # Usamos la puerta oficial de YouTube
     url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&order=viewCount&q=psicologia+oscura&maxResults=5&key={api_key}"
     
     try:
         respuesta = requests.get(url)
         datos = respuesta.json()
         
-        # Si YouTube devuelve un error, lo mostramos
         if 'error' in datos:
             print(f"❌ Error de YouTube: {datos['error']['message']}")
             return
@@ -31,7 +28,6 @@ def buscar_videos_virales():
             video_id = item['id']['videoId']
             url_video = f"https://youtube.com/watch?v={video_id}"
             
-            # Buscamos las estadísticas (views) de cada video
             url_stats = f"https://www.googleapis.com/youtube/v3/videos?part=statistics&id={video_id}&key={api_key}"
             resp_stats = requests.get(url_stats)
             stats = resp_stats.json()['items'][0]['statistics']
@@ -48,3 +44,4 @@ def buscar_videos_virales():
 
 if __name__ == "__main__":
     buscar_videos_virales()
+
